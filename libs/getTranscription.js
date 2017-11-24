@@ -1,5 +1,3 @@
-// TODO: Update to latest API syntax
-
 const settings = require('./getSettings')
 const speech = require('@google-cloud/speech')
 
@@ -8,19 +6,31 @@ const client = new speech.SpeechClient({
   keyFilename: './service-account.json',
 })
 
-const options = {
-  'languageCode': 'en-PE',
-  'sampleRate': 16600,
-  'encoding': 'LINEAR16',
+const config = {
+  encoding: 'LINEAR16',
+  sampleRateHertz: 16000,
+  languageCode: 'es-PE',
 }
 
 module.exports = fileName =>
   new Promise((resolve, reject) => {
-      speechClient.startRecognition(fileName, options, (err, operation) => {
-        if (err) return reject(err)
-        operation
-          .on('error', err => reject(err))
-          .on('complete', results => resolve(results))
-      })
-    },
+      const request = {
+        config,
+        audio: { uri: fileName }
+      }
+      client
+        .longRunningRecognize(request)
+        .then(data => {
+          const operation = data[0]
+          return operation.promise()
+        })
+        .then(data => {
+          const response = data[0]
+          const transcription = response.results
+            .map(result => result.alternatives[0].transcript)
+            .join('\n')
+          resolve(transcription)
+        })
+        .catch(err => reject(err))
+    }
   )

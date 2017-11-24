@@ -11,5 +11,5 @@ module.exports = filePath => new Promise((resolve, reject) =>
   bucket.upload(filePath, (err, file) => {
     if (err) reject(err)
     else resolve(file)
-  }),
+  })
 )

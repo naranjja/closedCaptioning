@@ -58,6 +58,10 @@ if (fs.existsSync(join(outputFolder, zipName))) {
   console.log('No cache file found. Downloading...')
   downloadFile(join(outputFolder, zipName), () => {
     console.log('Finished downloading!')
-    unzipFile(join(outputFolder, zipName))
+    unzipFile(join(outputFolder, zipName), () => {
+      updatePath(resolve(__dirname, '..', outputFolder, unzipName), () => {
+        console.log('FFMPEG correctly installed.')
+      })
+    })
   })
 }

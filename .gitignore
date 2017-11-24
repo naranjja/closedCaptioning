@@ -4,3 +4,6 @@ node_modules
 input/*
 output/*
 ffmpeg/*
+
+!/input/.gitkeep
+!/output/.gitkeep

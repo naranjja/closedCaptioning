@@ -1,9 +1,10 @@
+const settings = require('./libs/getSettings')
+
 const linear16 = require('./libs/getAudio')
 const cloudStore = require('./libs/storeAudio')
-// const cloudSpeech = require('./libs/getTranscription')
+const cloudSpeech = require('./libs/getTranscription')
 
 const path = require('path')
-const chalk = require('chalk')
 
 try {
 
@@ -23,17 +24,13 @@ try {
       console.log(`Storing ${path.basename(wavFile)}...`)
       return cloudStore(wavFile)
     })
-//     .then(storageFile => {
-//       countdown.message(`Transcribing ${storageFile.name}...`)
-//       return cloudSpeech('gs://messages-audio/' + storageFile.name)
-//     })
-//     .then(transcription => {
-//       countdown.stop()
-//       console.log(chalk.green(transcription))
-//     })
+    .then(storageFile => {
+      console.log(`Transcribing ${storageFile.name}...`)
+      return cloudSpeech(`gs://${settings.bucketName}/${storageFile.name}`)
+    })
+    .then(transcription => console.log(transcription))
     .catch(err => console.error(err))
 //
 } catch (err) {
-  console.log(chalk.red(err.message))
   console.error(err)
 }
