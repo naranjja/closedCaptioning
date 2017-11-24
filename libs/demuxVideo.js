@@ -1,5 +1,4 @@
 const ffmpeg = require('fluent-ffmpeg')
-const mime = require('mime')
 const fs = require('fs')
 
 module.exports = (filePathIn, filePathOut) => new Promise((resolve, reject) => {

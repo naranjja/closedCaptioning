@@ -1,36 +1,64 @@
+const fs = require('fs')
+
 const settings = require('./libs/getSettings')
 
-const linear16 = require('./libs/getAudio')
-const cloudStore = require('./libs/storeAudio')
-const cloudSpeech = require('./libs/getTranscription')
+const demux = require('./libs/demuxVideo')
+const upload = require('./libs/uploadFile')
+const transcribe = require('./libs/transcribeAudio')
+const save = require('./libs/saveTranscription')
 
-const path = require('path')
+const inputFolder = './input'
+const outputFolder = './output'
 
-try {
-
-  const params = {
-    input: './input/input.mp4',
-    output: './output/output.wav',
-  }
-
-  Promise.resolve(params)
-    .then(paths => {
-      console.log(
-        `Converting ${path.basename(paths.input)} to ${path.basename(
-          paths.output)}...`)
-      return linear16(paths.input, paths.output)
+fs.readdirAsync = dirname => {
+  return new Promise((resolve, reject) => {
+    fs.readdir(dirname, (err, filenames) => {
+      if (err) reject(err)
+      else resolve(filenames)
     })
-    .then(wavFile => {
-      console.log(`Storing ${path.basename(wavFile)}...`)
-      return cloudStore(wavFile)
-    })
-    .then(storageFile => {
-      console.log(`Transcribing ${storageFile.name}...`)
-      return cloudSpeech(`gs://${settings.bucketName}/${storageFile.name}`)
-    })
-    .then(transcription => console.log(transcription))
-    .catch(err => console.error(err))
-//
-} catch (err) {
-  console.error(err)
+  })
 }
+
+const makeParams = filename => {
+  return {
+    video: `${inputFolder}/${filename}`,
+    audio: `${outputFolder}/${filename.replace(/\.(.+)/g, '.wav')}`,
+    transcript: `${outputFolder}/${filename.replace(/\.(.+)/g, '.txt')}`
+  }
+}
+
+const isVideo = filename => filename.match(/.+\.mp4/g)
+
+fs.readdirAsync(inputFolder)
+  .then(filenames => {
+    filenames = filenames.filter(isVideo)
+    return Promise.all(filenames.map(makeParams))
+  })
+  .then(paramsList => {
+    paramsList.forEach(params => {
+      Promise.resolve(params)
+        .then(() => {
+          console.log(params.video)
+        })
+        .then(() => {
+          console.log('Extracting audio...')
+          return demux(params.video, params.audio)
+        })
+        .then(audioFile => {
+          console.log('Uploading audio...')
+          return upload(audioFile)
+        })
+        .then(object => {
+          console.log('Transcribing audio...')
+          return transcribe(`gs://${settings.bucketName}/${object.name}`)
+        })
+        .then(transcription => {
+          console.log('Saving transcription...')
+          return save(params.transcript, transcription)
+        })
+        .then(result => console.log(result))
+        .catch(err => console.error(err))
+    })
+  })
+  .catch(err => console.error(err))
+
