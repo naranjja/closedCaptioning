@@ -40,6 +40,7 @@ const unzipFile = (path, callback) => {
     .on('finish', () => callback())
 }
 
+// TODO: Check if OS is Linux, if it is simply run sudo apt-get install ffmpeg
 if (fs.existsSync(join(outputFolder, zipName))) {
   console.log('Cached file found.')
   if (!fs.existsSync(join(outputFolder, unzipName))) {

@@ -32,6 +32,7 @@ const isVideo = filename => filename.match(/.+\.mp4/g)
 fs.readdirAsync(inputFolder)
   .then(filenames => {
     filenames = filenames.filter(isVideo)
+    console.log(`Processing the following files: ${JSON.stringify(filenames, null, 1)}`)
     return Promise.all(filenames.map(makeParams))
   })
   .then(paramsList => {
@@ -57,7 +58,13 @@ fs.readdirAsync(inputFolder)
           return save(params.transcript, transcription)
         })
         .then(result => console.log(result))
-        .catch(err => console.error(err))
+        .catch(err => {
+          if (err.stack.includes("Cannot find ffmpeg")) {
+            console.log("FFMPEG not found, installing...")
+            require("./libs/installFFMPEG")
+          }
+          else console.error(err)
+        })
     })
   })
   .catch(err => console.error(err))

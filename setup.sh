@@ -25,4 +25,4 @@ gcloud iam service-accounts keys create service-account.json \
 export GOOGLE_APPLICATION_CREDENTIALS=$PWD/service-account.json
 
 # Create the bucket to store the process
-call gsutil mb -p $PROJECT_ID gs://$BUCKET_NAME/
+gsutil mb -p $PROJECT_ID gs://$BUCKET_NAME/
