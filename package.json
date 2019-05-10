@@ -10,8 +10,8 @@
   "author": "Jose Naranjo",
   "license": "MIT",
   "dependencies": {
-    "@google-cloud/speech": "^0.11.0",
-    "@google-cloud/storage": "^1.4.0",
+    "@google-cloud/speech": "^2.3.1",
+    "@google-cloud/storage": "^2.5.0",
     "chalk": "^2.3.0",
     "clui": "^0.3.6",
     "fluent-ffmpeg": "^2.1.2",

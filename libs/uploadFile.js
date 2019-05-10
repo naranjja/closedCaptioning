@@ -1,6 +1,7 @@
 const settings = require('./getSettings')
+const {Storage} = require('@google-cloud/storage');
 
-const gcs = require('@google-cloud/storage')({
+const gcs = new Storage({
   projectId: settings.projectId,
   keyFilename: './service-account.json',
 })

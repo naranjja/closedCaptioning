@@ -9,7 +9,7 @@ const client = new speech.SpeechClient({
 const config = {
   encoding: 'LINEAR16',
   sampleRateHertz: 16000,
-  languageCode: 'es-ES',  // TODO: Prompt for language
+  languageCode: 'en-GB',  // TODO: Prompt for language
 }
 
 module.exports = fileName =>

@@ -59,7 +59,7 @@ fs.readdirAsync(inputFolder)
         })
         .then(result => console.log(result))
         .catch(err => {
-          if (err.stack.includes("Cannot find ffmpeg")) {
+          if (err.stack && err.stack.includes("Cannot find ffmpeg")) {
             console.log("FFMPEG not found, installing...")
             require("./libs/installFFMPEG")
           }
